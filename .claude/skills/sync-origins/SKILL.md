@@ -5,9 +5,10 @@ description: Use this skill any time you are about to work on plot — choosing 
 
 # Sync Origins Skill
 
-The book and the TV series are not always aligned: episodes reorder events, compress arcs, or invent scenes. Whenever you are about to write or reason about *what happens* in the story, you must first reconcile the two canonical sources defined in `documentation/08_source_sync.md`:
+The book and the TV series are not always aligned: episodes reorder events, compress arcs, or invent scenes. The Ukrainian book text is also an abridged 17-chapter edition, so it can miss material the episodes draw on. Whenever you are about to write or reason about *what happens* in the story, you must first reconcile the canonical sources defined in `documentation/08_source_sync.md`:
 
-- **Book text:** `documentation/laherlef-selma-dyvovyzhna-podorozh-nilsa-kholhersona-z-dykymy-husakamy-shvetsiieiu-(dyvovyzhni-mandry-nilsa-z-dykymy-husmy)8371.html`
+- **Primary book text (UA, abridged, 17 chapters):** `documentation/laherlef-selma-dyvovyzhna-podorozh-nilsa-kholhersona-z-dykymy-husakamy-shvetsiieiu-(dyvovyzhni-mandry-nilsa-z-dykymy-husmy)8371.html`
+- **Fallback book text (RU, full Brauде translation, 1982, ~55 chapters):** referenced via `08_source_sync.md`; use only when the UA edition is missing the needed scene/passage.
 - **Episode synopses:** `https://www.imdb.com/title/tt0296386/episodes/`
 
 ## When this skill applies
@@ -24,16 +25,23 @@ Skip when the task is purely formatting, layout, or non-plot metadata.
 ## Steps
 
 1. **Identify the anchor** — is the starting point a *text fragment* (chapter, scene, quote) or an *episode range* (e.g. "S01E03")? Write down which you know.
-2. **Locate the counterpart**
+2. **Locate the counterpart in the UA text first**
    - Text → episode: scan the IMDB episode synopses to find which episode(s) cover that scene.
-   - Episode → text: open the book HTML and find the chapter(s) the episode is drawn from.
-3. **Compare** — note any mismatches: reordered events, omitted characters, invented scenes, compressed arcs.
-4. **Decide the working scope** — pick the specific text passage *and* the specific episode(s) you will use. If they conflict, follow the rule from `08_source_sync.md`: module logic follows the **real episode plot** and the module's agreed learning focus, not the book where they diverge.
-5. **Only now** produce the requested output (quote, summary, question set, scene list, etc.), citing both the text passage and the episode(s) you settled on.
+   - Episode → text: open the UA book HTML and find the chapter(s) the episode is drawn from.
+3. **If the UA text is missing the needed material, fall back to the RU full edition (Brauде, 1982)**
+   - Confirm the gap is real (the scene is not in the UA 17-chapter abridgement, not just under a different chapter title).
+   - Locate the corresponding passage in the RU full translation referenced in `08_source_sync.md`.
+   - When quoting from RU, output the **Russian original** AND an **auto-translation into Ukrainian** side by side, and label both clearly (`оригінал (рос., Брауде 1982)` / `автопереклад укр.`). Never present a Russian-derived passage as if it were the UA canonical text.
+4. **Compare** — note any mismatches between book(s) and episode: reordered events, omitted characters, invented scenes, compressed arcs, or content present only in the RU full edition.
+5. **Decide the working scope** — pick the specific text passage *and* the specific episode(s) you will use. If they conflict, follow the rule from `08_source_sync.md`: module logic follows the **real episode plot** and the module's agreed learning focus, not the book where they diverge.
+6. **Only now** produce the requested output (quote, summary, question set, scene list, etc.), citing the text source (UA or RU+autotranslation) and the episode(s) you settled on.
 
 ## Rules
 
 - Never produce plot-grounded content from memory or from only one source — always pin both a text passage and an episode reference before writing.
-- When citing, give a locatable anchor: chapter title / heading from the HTML for text, `S01E0X` (or episode title) for the series.
+- **Priority of book sources: UA abridged → RU full.** Reach for RU only after confirming the UA edition does not cover the scene.
+- When citing UA, give a locatable anchor: chapter title / heading from the HTML.
+- When citing RU, label the quote as `оригінал (рос., Брауде 1982)` and provide a Ukrainian auto-translation directly beneath it; the user reads the UA rendering, the RU is there for traceability.
+- For episodes, anchor with `S01E0X` (or episode title) from the IMDB list.
 - If the two sources clearly disagree, surface the divergence in the output so the user can decide; don't silently pick one.
 - Reference `documentation/08_source_sync.md` for the canonical source list rather than re-pasting URLs.
