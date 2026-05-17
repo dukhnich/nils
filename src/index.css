@@ -51,15 +51,29 @@
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  text-align: left;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+}
+
+/* additional tokens used by CharacterChat */
+:root {
+  --card-bg: rgba(255 255 255 / 0.04);
+  --input-bg: rgba(255 255 255 / 0.06);
+  --hover-bg: rgba(255 255 255 / 0.06);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --card-bg: rgba(0 0 0 / 0.04);
+    --input-bg: rgba(0 0 0 / 0.04);
+    --hover-bg: rgba(0 0 0 / 0.04);
+  }
 }
 
 body {
