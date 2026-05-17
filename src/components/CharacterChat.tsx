@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { characters, type Character } from '../characters';
-import { initClient, isClientReady, streamChat, type ChatMessage } from '../lib/claude';
+import { streamChat, type ChatMessage } from '../lib/claude';
 import './CharacterChat.css';
 
 export function CharacterChat() {
-  const [apiKey, setApiKey] = useState('');
-  const [apiKeyConfirmed, setApiKeyConfirmed] = useState(false);
   const [selectedChar, setSelectedChar] = useState<Character>(characters[0]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
@@ -20,17 +18,6 @@ export function CharacterChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  function confirmApiKey() {
-    const key = apiKey.trim();
-    if (!key.startsWith('sk-')) {
-      setError('Key should start with sk-');
-      return;
-    }
-    initClient(key);
-    setApiKeyConfirmed(true);
-    setError('');
-  }
-
   function selectCharacter(char: Character) {
     if (streaming) return;
     setSelectedChar(char);
@@ -41,7 +28,7 @@ export function CharacterChat() {
 
   async function sendMessage() {
     const text = draft.trim();
-    if (!text || streaming || !isClientReady()) return;
+    if (!text || streaming) return;
 
     setDraft('');
     setError('');
@@ -90,35 +77,6 @@ export function CharacterChat() {
       e.preventDefault();
       sendMessage();
     }
-  }
-
-  // — API key gate —
-  if (!apiKeyConfirmed) {
-    return (
-      <div className="cc-key-gate">
-        <div className="cc-key-card">
-          <h2>Nils Holgersson — Character Chat</h2>
-          <p>
-            Enter your <strong>Anthropic API key</strong> to start chatting with characters from
-            the story. The key is used only in this browser session and never sent anywhere except
-            directly to the Anthropic API.
-          </p>
-          <input
-            type="password"
-            className="cc-key-input"
-            placeholder="sk-ant-..."
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && confirmApiKey()}
-            autoFocus
-          />
-          {error && <p className="cc-error">{error}</p>}
-          <button className="cc-btn cc-btn-primary" onClick={confirmApiKey}>
-            Start chatting
-          </button>
-        </div>
-      </div>
-    );
   }
 
   // — Main chat UI —

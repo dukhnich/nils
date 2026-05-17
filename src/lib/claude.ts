@@ -1,16 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
-
 export type ChatMessage = { role: 'user' | 'assistant'; content: string };
-
-let client: Anthropic | null = null;
-
-export function initClient(apiKey: string): void {
-  client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-}
-
-export function isClientReady(): boolean {
-  return client !== null;
-}
 
 export async function streamChat(
   systemPrompt: string,
@@ -18,18 +6,37 @@ export async function streamChat(
   onText: (delta: string) => void,
   signal?: AbortSignal,
 ): Promise<void> {
-  if (!client) throw new Error('Anthropic client not initialised — provide an API key first.');
-
-  const stream = client.messages.stream({
-    model: 'claude-sonnet-4-0',
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages,
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ systemPrompt, messages }),
+    signal,
   });
 
-  // Abort support: cancel the underlying request if the signal fires
-  signal?.addEventListener('abort', () => stream.abort());
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Server error ${res.status}${body ? `: ${body}` : ''}`);
+  }
 
-  stream.on('text', onText);
-  await stream.finalMessage();
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6).trim();
+      if (data === '[DONE]') return;
+      const parsed = JSON.parse(data) as { text?: string; error?: string };
+      if (parsed.error) throw new Error(parsed.error);
+      if (parsed.text) onText(parsed.text);
+    }
+  }
 }
