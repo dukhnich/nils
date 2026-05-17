@@ -35,7 +35,7 @@ export function CharacterChat() {
 
     const userMsg: ChatMessage = { role: 'user', content: text };
     const history = [...messages, userMsg];
-    setMessages([...history, { role: 'assistant', content: '' }]);
+    setMessages([...history, { role: 'assistant', content: selectedChar.prefill ?? '' }]);
     setStreaming(true);
 
     const ctrl = new AbortController();
@@ -56,6 +56,7 @@ export function CharacterChat() {
         ctrl.signal,
         selectedChar.temperature,
         selectedChar.stopSequences,
+        selectedChar.prefill,
       );
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {

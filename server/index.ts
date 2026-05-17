@@ -10,12 +10,17 @@ const client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
 type Message = { role: 'user' | 'assistant'; content: string };
 
 app.post('/api/chat', async (req, res) => {
-  const { systemPrompt, messages, temperature, stopSequences } = req.body as {
+  const { systemPrompt, messages, temperature, stopSequences, prefill } = req.body as {
     systemPrompt: string;
     messages: Message[];
     temperature?: number;
     stopSequences?: string[];
+    prefill?: string;
   };
+
+  const apiMessages: Message[] = prefill
+    ? [...messages, { role: 'assistant', content: prefill }]
+    : messages;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -28,7 +33,7 @@ app.post('/api/chat', async (req, res) => {
       temperature,
       stop_sequences: stopSequences,
       system: systemPrompt,
-      messages,
+      messages: apiMessages,
     });
 
     req.on('close', () => stream.abort());
