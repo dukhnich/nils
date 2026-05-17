@@ -55,6 +55,7 @@ export function CharacterChat() {
         },
         ctrl.signal,
         selectedChar.temperature,
+        selectedChar.stopSequences,
       );
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {

@@ -10,10 +10,11 @@ const client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
 type Message = { role: 'user' | 'assistant'; content: string };
 
 app.post('/api/chat', async (req, res) => {
-  const { systemPrompt, messages, temperature } = req.body as {
+  const { systemPrompt, messages, temperature, stopSequences } = req.body as {
     systemPrompt: string;
     messages: Message[];
     temperature?: number;
+    stopSequences?: string[];
   };
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -25,6 +26,7 @@ app.post('/api/chat', async (req, res) => {
       model: 'claude-sonnet-4-5',
       max_tokens: 1024,
       temperature,
+      stop_sequences: stopSequences,
       system: systemPrompt,
       messages,
     });

@@ -6,11 +6,12 @@ export async function streamChat(
   onText: (delta: string) => void,
   signal?: AbortSignal,
   temperature?: number,
+  stopSequences?: string[],
 ): Promise<void> {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemPrompt, messages, temperature }),
+    body: JSON.stringify({ systemPrompt, messages, temperature, stopSequences }),
     signal,
   });
 
