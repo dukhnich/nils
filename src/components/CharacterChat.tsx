@@ -54,6 +54,7 @@ export function CharacterChat() {
           });
         },
         ctrl.signal,
+        selectedChar.temperature,
       );
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {
