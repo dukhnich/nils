@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "eval": "tsx scripts/eval.ts",
     "dev": "concurrently \"vite\" \"tsx server/index.ts\"",
     "dev:client": "vite",
     "dev:server": "tsx server/index.ts",
