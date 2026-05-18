@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { characters, type Character } from '../characters';
 import { streamChat, type ChatMessage } from '../lib/claude';
+import { isCyrillic } from '../lib/lang';
 import './CharacterChat.css';
 
 export function CharacterChat() {
@@ -33,9 +34,10 @@ export function CharacterChat() {
     setDraft('');
     setError('');
 
+    const prefill = isCyrillic(text) ? '— ' : (selectedChar.prefill ?? '');
     const userMsg: ChatMessage = { role: 'user', content: text };
     const history = [...messages, userMsg];
-    setMessages([...history, { role: 'assistant', content: selectedChar.prefill ?? '' }]);
+    setMessages([...history, { role: 'assistant', content: prefill }]);
     setStreaming(true);
 
     const ctrl = new AbortController();
@@ -56,7 +58,7 @@ export function CharacterChat() {
         ctrl.signal,
         selectedChar.temperature,
         selectedChar.stopSequences,
-        selectedChar.prefill,
+        prefill || undefined,
       );
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {

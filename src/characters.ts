@@ -9,7 +9,11 @@ export interface Character {
   prefill?: string;
 }
 
-const DIALOGUE_STOPS = ['You:', 'Reader:', 'Human:'];
+const DIALOGUE_STOPS = [
+  'You:', 'Reader:', 'Human:',
+  'Ти:', 'Читач:', 'Ви:',
+  'Ты:', 'Читатель:', 'Вы:',
+];
 
 export const characters: Character[] = [
   {
