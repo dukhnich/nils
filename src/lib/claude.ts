@@ -8,11 +8,12 @@ export async function streamChat(
   temperature?: number,
   stopSequences?: string[],
   prefill?: string,
+  sessionId?: string,
 ): Promise<void> {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemPrompt, messages, temperature, stopSequences, prefill }),
+    body: JSON.stringify({ systemPrompt, messages, temperature, stopSequences, prefill, sessionId }),
     signal,
   });
 

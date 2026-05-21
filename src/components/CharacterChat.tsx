@@ -5,6 +5,7 @@ import { isCyrillic } from '../lib/lang';
 import './CharacterChat.css';
 
 export function CharacterChat() {
+  const [sessionId] = useState(() => crypto.randomUUID());
   const [selectedChar, setSelectedChar] = useState<Character>(characters[0]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
@@ -59,6 +60,7 @@ export function CharacterChat() {
         selectedChar.temperature,
         selectedChar.stopSequences,
         prefill || undefined,
+        sessionId,
       );
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {
