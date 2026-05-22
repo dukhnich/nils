@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import { lookupFact } from './knowledge';
+import { initRag, searchStory } from './rag';
 
 const app = express();
 app.use(express.json());
@@ -84,11 +85,26 @@ const TOOLS: Anthropic.Tool[] = [
       required: [],
     },
   },
+  {
+    name: 'search_story',
+    description:
+      'Search the full Nils Holgersson book text for relevant passages. Use for questions about specific episodes, events, provinces, minor characters, or anything not covered by get_character_info. Returns up to 3 passages from the Ukrainian and Russian source texts.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Natural-language search query in any language.',
+        },
+      },
+      required: ['query'],
+    },
+  },
 ];
 
 // --- Tool executor ------------------------------------------------------------
 
-function executeTool(name: string, input: Record<string, string>, sessionId: string): string {
+async function executeTool(name: string, input: Record<string, string>, sessionId: string): Promise<string> {
   switch (name) {
     case 'get_character_info':
       return lookupFact(input.query ?? '');
@@ -109,6 +125,9 @@ function executeTool(name: string, input: Record<string, string>, sessionId: str
         ? 'No memories saved yet for this reader.'
         : entries.map(([k, v]) => `${k}: ${v}`).join('\n');
     }
+
+    case 'search_story':
+      return searchStory(input.query ?? '');
 
     default:
       return `Unknown tool: ${name}`;
@@ -166,13 +185,15 @@ app.post('/api/chat', async (req, res) => {
 
       currentMessages = [...currentMessages, { role: 'assistant', content: resp.content }];
 
-      const results: Anthropic.ToolResultBlockParam[] = resp.content
-        .filter((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use')
-        .map((b) => ({
-          type: 'tool_result',
-          tool_use_id: b.id,
-          content: executeTool(b.name, b.input as Record<string, string>, sessionId),
-        }));
+      const results: Anthropic.ToolResultBlockParam[] = await Promise.all(
+        resp.content
+          .filter((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use')
+          .map(async (b) => ({
+            type: 'tool_result' as const,
+            tool_use_id: b.id,
+            content: await executeTool(b.name, b.input as Record<string, string>, sessionId),
+          })),
+      );
 
       currentMessages = [...currentMessages, { role: 'user', content: results }];
     }
@@ -203,4 +224,5 @@ app.post('/api/chat', async (req, res) => {
 });
 
 const PORT = process.env.PORT ?? 3001;
+await initRag();
 app.listen(PORT, () => console.log(`API server → http://localhost:${PORT}`));
