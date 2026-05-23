@@ -1,3 +1,7 @@
+.ig-panel[hidden] {
+  display: none;
+}
+
 .ig-panel {
   position: absolute;
   bottom: 100%;

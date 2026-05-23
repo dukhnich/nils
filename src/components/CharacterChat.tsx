@@ -167,15 +167,14 @@ export function CharacterChat() {
         </div>
 
         <div className="cc-bottom">
-          {/* Image gallery panel — floats above the input row */}
-          {galleryOpen && (
-            <ImageGallery
-              selected={selectedImages}
-              onToggle={toggleImage}
-              onClose={() => setGalleryOpen(false)}
-              characterName={selectedChar.name}
-            />
-          )}
+          {/* Image gallery panel — always mounted, hidden when closed to avoid remount scroll bugs */}
+          <ImageGallery
+            isOpen={galleryOpen}
+            selected={selectedImages}
+            onToggle={toggleImage}
+            onClose={() => setGalleryOpen(false)}
+            characterName={selectedChar.name}
+          />
 
           {/* Selected images strip (when gallery is closed) */}
           {!galleryOpen && selectedImages.size > 0 && (
