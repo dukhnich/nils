@@ -138,10 +138,29 @@ async function executeTool(name: string, input: Record<string, string>, sessionI
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
+type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+
+function buildApiMessages(messages: Message[], images?: string[]): Anthropic.MessageParam[] {
+  return messages.map((m, i) => {
+    if (images && images.length > 0 && i === messages.length - 1 && m.role === 'user') {
+      const imageBlocks: Anthropic.ImageBlockParam[] = images.map((dataUrl) => {
+        const comma = dataUrl.indexOf(',');
+        const header = dataUrl.slice(0, comma);
+        const data = dataUrl.slice(comma + 1);
+        const mediaType = (header.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg') as SupportedMediaType;
+        return { type: 'image', source: { type: 'base64', media_type: mediaType, data } };
+      });
+      return { role: 'user', content: [...imageBlocks, { type: 'text', text: m.content }] };
+    }
+    return { role: m.role, content: m.content };
+  });
+}
+
 app.post('/api/chat', async (req, res) => {
   const {
     systemPrompt,
     messages,
+    images,
     temperature,
     stopSequences,
     prefill,
@@ -149,15 +168,17 @@ app.post('/api/chat', async (req, res) => {
   } = req.body as {
     systemPrompt: string;
     messages: Message[];
+    images?: string[];
     temperature?: number;
     stopSequences?: string[];
     prefill?: string;
     sessionId?: string;
   };
 
+  const apiMessages = buildApiMessages(messages, images);
   const seed: Anthropic.MessageParam[] = prefill
-    ? [...messages, { role: 'assistant', content: prefill }]
-    : messages;
+    ? [...apiMessages, { role: 'assistant', content: prefill }]
+    : apiMessages;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -168,7 +189,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     // Tool loop — runs non-streaming until Claude stops calling tools
-    let currentMessages: Anthropic.MessageParam[] = [...seed];
+    let currentMessages: Anthropic.MessageParam[] = seed;
 
     for (let i = 0; i < 5; i++) {
       const resp = await client.messages.create({

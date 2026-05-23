@@ -1,8 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { characters, type Character } from '../characters';
 import { streamChat, type ChatMessage } from '../lib/claude';
+import { BOOK_IMAGES, type BookImage } from '../lib/images';
 import { isCyrillic } from '../lib/lang';
+import { ImageGallery } from './ImageGallery';
 import './CharacterChat.css';
+
+async function toBase64(img: BookImage): Promise<string> {
+  const res = await fetch(img.src);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
 
 export function CharacterChat() {
   const [sessionId] = useState(() => crypto.randomUUID());
@@ -11,6 +24,8 @@ export function CharacterChat() {
   const [draft, setDraft] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState('');
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -25,7 +40,17 @@ export function CharacterChat() {
     setSelectedChar(char);
     setMessages([]);
     setError('');
+    setSelectedImages(new Set());
     inputRef.current?.focus();
+  }
+
+  function toggleImage(id: string) {
+    setSelectedImages((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }
 
   async function sendMessage() {
@@ -34,6 +59,14 @@ export function CharacterChat() {
 
     setDraft('');
     setError('');
+
+    let encodedImages: string[] | undefined;
+    if (selectedImages.size > 0) {
+      const toEncode = BOOK_IMAGES.filter((img) => selectedImages.has(img.id));
+      encodedImages = await Promise.all(toEncode.map(toBase64));
+      setSelectedImages(new Set());
+      setGalleryOpen(false);
+    }
 
     const prefill = isCyrillic(text) ? '— ' : (selectedChar.prefill ?? '');
     const userMsg: ChatMessage = { role: 'user', content: text };
@@ -61,11 +94,11 @@ export function CharacterChat() {
         selectedChar.stopSequences,
         prefill || undefined,
         sessionId,
+        encodedImages,
       );
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {
         setError(err.message);
-        // Remove the empty assistant placeholder on error
         setMessages((prev) => (prev[prev.length - 1]?.content === '' ? prev.slice(0, -1) : prev));
       }
     } finally {
@@ -86,7 +119,6 @@ export function CharacterChat() {
     }
   }
 
-  // — Main chat UI —
   return (
     <div className="cc-root">
       {/* Character picker */}
@@ -134,6 +166,34 @@ export function CharacterChat() {
           <div ref={bottomRef} />
         </div>
 
+        {/* Image gallery panel */}
+        {galleryOpen && (
+          <ImageGallery
+            selected={selectedImages}
+            onToggle={toggleImage}
+            onClose={() => setGalleryOpen(false)}
+            characterName={selectedChar.name}
+          />
+        )}
+
+        {/* Selected images strip (when gallery is closed) */}
+        {!galleryOpen && selectedImages.size > 0 && (
+          <div className="cc-selected-strip">
+            {BOOK_IMAGES.filter((img) => selectedImages.has(img.id)).map((img) => (
+              <div key={img.id} className="cc-selected-thumb">
+                <img src={img.src} alt={img.title} />
+                <button
+                  className="cc-selected-remove"
+                  onClick={() => toggleImage(img.id)}
+                  aria-label={`Remove ${img.title}`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {error && <p className="cc-error cc-error--chat">{error}</p>}
 
         <div className="cc-input-row">
@@ -148,6 +208,14 @@ export function CharacterChat() {
             disabled={streaming}
             aria-label="Your message"
           />
+          <button
+            className={`cc-btn cc-btn-gallery${selectedImages.size > 0 ? ' cc-btn-gallery--active' : ''}`}
+            onClick={() => setGalleryOpen((v) => !v)}
+            title="Show book illustrations"
+            aria-pressed={galleryOpen}
+          >
+            🖼{selectedImages.size > 0 ? <span className="cc-gallery-badge">{selectedImages.size}</span> : null}
+          </button>
           {streaming ? (
             <button className="cc-btn cc-btn-stop" onClick={stopStreaming} title="Stop">
               ⏹
