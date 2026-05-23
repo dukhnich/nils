@@ -108,6 +108,11 @@
   overflow: hidden;
 }
 
+.cc-bottom {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .cc-chat-header {
   display: flex;
   align-items: center;

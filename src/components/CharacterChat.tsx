@@ -166,69 +166,71 @@ export function CharacterChat() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Image gallery panel */}
-        {galleryOpen && (
-          <ImageGallery
-            selected={selectedImages}
-            onToggle={toggleImage}
-            onClose={() => setGalleryOpen(false)}
-            characterName={selectedChar.name}
-          />
-        )}
-
-        {/* Selected images strip (when gallery is closed) */}
-        {!galleryOpen && selectedImages.size > 0 && (
-          <div className="cc-selected-strip">
-            {BOOK_IMAGES.filter((img) => selectedImages.has(img.id)).map((img) => (
-              <div key={img.id} className="cc-selected-thumb">
-                <img src={img.src} alt={img.title} />
-                <button
-                  className="cc-selected-remove"
-                  onClick={() => toggleImage(img.id)}
-                  aria-label={`Remove ${img.title}`}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {error && <p className="cc-error cc-error--chat">{error}</p>}
-
-        <div className="cc-input-row">
-          <textarea
-            ref={inputRef}
-            className="cc-textarea"
-            rows={2}
-            placeholder={`Message ${selectedChar.name}… (Enter to send, Shift+Enter for new line)`}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={streaming}
-            aria-label="Your message"
-          />
-          <button
-            className={`cc-btn cc-btn-gallery${selectedImages.size > 0 ? ' cc-btn-gallery--active' : ''}`}
-            onClick={() => setGalleryOpen((v) => !v)}
-            title="Show book illustrations"
-            aria-pressed={galleryOpen}
-          >
-            🖼{selectedImages.size > 0 ? <span className="cc-gallery-badge">{selectedImages.size}</span> : null}
-          </button>
-          {streaming ? (
-            <button className="cc-btn cc-btn-stop" onClick={stopStreaming} title="Stop">
-              ⏹
-            </button>
-          ) : (
-            <button
-              className="cc-btn cc-btn-primary"
-              onClick={sendMessage}
-              disabled={!draft.trim()}
-            >
-              Send
-            </button>
+        <div className="cc-bottom">
+          {/* Image gallery panel — floats above the input row */}
+          {galleryOpen && (
+            <ImageGallery
+              selected={selectedImages}
+              onToggle={toggleImage}
+              onClose={() => setGalleryOpen(false)}
+              characterName={selectedChar.name}
+            />
           )}
+
+          {/* Selected images strip (when gallery is closed) */}
+          {!galleryOpen && selectedImages.size > 0 && (
+            <div className="cc-selected-strip">
+              {BOOK_IMAGES.filter((img) => selectedImages.has(img.id)).map((img) => (
+                <div key={img.id} className="cc-selected-thumb">
+                  <img src={img.src} alt={img.title} />
+                  <button
+                    className="cc-selected-remove"
+                    onClick={() => toggleImage(img.id)}
+                    aria-label={`Remove ${img.title}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {error && <p className="cc-error cc-error--chat">{error}</p>}
+
+          <div className="cc-input-row">
+            <textarea
+              ref={inputRef}
+              className="cc-textarea"
+              rows={2}
+              placeholder={`Message ${selectedChar.name}… (Enter to send, Shift+Enter for new line)`}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={streaming}
+              aria-label="Your message"
+            />
+            <button
+              className={`cc-btn cc-btn-gallery${selectedImages.size > 0 ? ' cc-btn-gallery--active' : ''}`}
+              onClick={() => setGalleryOpen((v) => !v)}
+              title="Show book illustrations"
+              aria-pressed={galleryOpen}
+            >
+              🖼{selectedImages.size > 0 ? <span className="cc-gallery-badge">{selectedImages.size}</span> : null}
+            </button>
+            {streaming ? (
+              <button className="cc-btn cc-btn-stop" onClick={stopStreaming} title="Stop">
+                ⏹
+              </button>
+            ) : (
+              <button
+                className="cc-btn cc-btn-primary"
+                onClick={sendMessage}
+                disabled={!draft.trim()}
+              >
+                Send
+              </button>
+            )}
+          </div>
         </div>
       </section>
     </div>
