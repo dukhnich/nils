@@ -142,7 +142,8 @@ type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp
 
 function buildApiMessages(messages: Message[], images?: string[]): Anthropic.MessageParam[] {
   return messages.map((m, i) => {
-    if (images && images.length > 0 && i === messages.length - 1 && m.role === 'user') {
+    const isLastUser = i === messages.length - 1 && m.role === 'user';
+    if (isLastUser && images && images.length > 0) {
       const imageBlocks: Anthropic.ImageBlockParam[] = images.map((dataUrl) => {
         const comma = dataUrl.indexOf(',');
         const header = dataUrl.slice(0, comma);
@@ -150,7 +151,13 @@ function buildApiMessages(messages: Message[], images?: string[]): Anthropic.Mes
         const mediaType = (header.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg') as SupportedMediaType;
         return { type: 'image', source: { type: 'base64', media_type: mediaType, data } };
       });
-      return { role: 'user', content: [...imageBlocks, { type: 'text', text: m.content }] };
+      return {
+        role: 'user',
+        content: [...imageBlocks, { type: 'text', text: m.content, cache_control: { type: 'ephemeral' } }],
+      };
+    }
+    if (isLastUser) {
+      return { role: 'user', content: [{ type: 'text', text: m.content, cache_control: { type: 'ephemeral' } }] };
     }
     return { role: m.role, content: m.content };
   });
