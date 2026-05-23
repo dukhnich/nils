@@ -14,7 +14,12 @@ export function ImageGallery({ isOpen, selected, onToggle, onClose, characterNam
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen && gridRef.current) gridRef.current.scrollTop = 0;
+    if (!isOpen) return;
+    // rAF fires after layout/paint, after Chrome's scroll-to-focused-element pass
+    const id = requestAnimationFrame(() => {
+      if (gridRef.current) gridRef.current.scrollTop = 0;
+    });
+    return () => cancelAnimationFrame(id);
   }, [isOpen]);
 
   return (
