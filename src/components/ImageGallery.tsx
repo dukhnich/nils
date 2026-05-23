@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { BOOK_IMAGES } from '../lib/images';
 import './ImageGallery.css';
 
@@ -10,6 +11,12 @@ interface Props {
 }
 
 export function ImageGallery({ isOpen, selected, onToggle, onClose, characterName }: Props) {
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && gridRef.current) gridRef.current.scrollTop = 0;
+  }, [isOpen]);
+
   return (
     <div className="ig-panel" hidden={!isOpen}>
       <div className="ig-header">
@@ -19,7 +26,7 @@ export function ImageGallery({ isOpen, selected, onToggle, onClose, characterNam
         </span>
         <button className="ig-close" onClick={onClose} aria-label="Close gallery">✕</button>
       </div>
-      <div className="ig-grid">
+      <div className="ig-grid" ref={gridRef}>
         {BOOK_IMAGES.map((img) => {
           const isSelected = selected.has(img.id);
           return (
