@@ -4,6 +4,7 @@ export interface Character {
   emoji: string;
   tagline: string;
   hint: string;
+  accentRgb: string;
   systemPrompt: string;
   temperature: number;
   stopSequences: string[];
@@ -23,6 +24,7 @@ export const characters: Character[] = [
     emoji: '🧒',
     tagline: 'The boy who flies with wild geese',
     hint: 'Ask about the tomte, what it\'s like to ride Morten, or life at thumb-size.',
+    accentRgb: '52, 132, 95',
     temperature: 0.8,
     stopSequences: DIALOGUE_STOPS,
     prefill: 'Ha, ',
@@ -38,6 +40,7 @@ Speak in first person as Nils. You are small enough that a crow's feather is as 
     emoji: '🪿',
     tagline: 'The loyal white goose who carries Nils',
     hint: 'Ask about flying with the wild geese, carrying Nils, or the farm you left behind.',
+    accentRgb: '76, 140, 112',
     temperature: 0.5,
     stopSequences: DIALOGUE_STOPS,
     prefill: 'Oh, well, ',
@@ -53,6 +56,7 @@ Speak in first person as Morten. Refer to Nils affectionately. You are in awe of
     emoji: '🦢',
     tagline: 'The ancient, wise leader of the wild grey geese',
     hint: 'Ask about the laws of migration, the flock, or what you make of the boy.',
+    accentRgb: '64, 116, 142',
     temperature: 0.3,
     stopSequences: ['\n\n', ...DIALOGUE_STOPS],
     systemPrompt: `You are Akka from Kebnekaise (Акка з Кебнекайсе), the revered leader of a flock of wild grey geese. You are over a hundred years old and have made the great migration across Sweden and back more times than you can count. You know every lake, mountain, and flyway in the country. You allowed the shrunk boy Nils Holgersson to travel with your flock after he proved his worth — but you still watch him.
@@ -67,6 +71,7 @@ Speak in first person as Akka. Your speech is deliberate and spare. You refer to
     emoji: '🦊',
     tagline: 'The cunning fox who will not give up the chase',
     hint: 'Ask about your schemes against the geese, your grudge with Nils, or the hunt.',
+    accentRgb: '188, 80, 38',
     temperature: 0.9,
     stopSequences: DIALOGUE_STOPS,
     prefill: 'Ah… ',
@@ -82,6 +87,7 @@ Speak in first person as Smirre. You are always calculating. You speak of Nils w
     emoji: '🦅',
     tagline: 'The great eagle who soars above it all',
     hint: 'Ask what you see from the heights, why you befriended the tiny boy, or life as an eagle.',
+    accentRgb: '180, 132, 40',
     temperature: 0.4,
     stopSequences: DIALOGUE_STOPS,
     systemPrompt: `You are Gorgo, a great golden eagle who soars over the mountains and forests of northern Sweden. You are powerful, solitary, and accustomed to seeing the world from heights other birds never reach. You encountered Nils Holgersson and the wild geese during their northern journey, and — against the nature of things — you became something close to a friend to the tiny boy.
@@ -96,6 +102,7 @@ Speak in first person as Gorgo. You see the world from great height, literally a
     emoji: '🐦',
     tagline: 'The cheerful puffin of the Stockholm archipelago',
     hint: 'Ask about the island skerries, what you think of Nils, or life on the archipelago.',
+    accentRgb: '32, 148, 166',
     temperature: 1.0,
     stopSequences: DIALOGUE_STOPS,
     prefill: 'Oh! ',

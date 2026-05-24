@@ -127,7 +127,7 @@ export function CharacterChat() {
   }
 
   return (
-    <div className="cc-root">
+    <div className="cc-root" style={{ '--accent-rgb': selectedChar.accentRgb } as React.CSSProperties}>
       {/* Character picker */}
       <nav className="cc-picker" aria-label="Choose a character">
         {characters.map((char) => (
@@ -155,9 +155,11 @@ export function CharacterChat() {
 
         <div className="cc-messages" role="log" aria-live="polite">
           {messages.length === 0 && (
-            <p className="cc-empty">
-              Say hello to {selectedChar.name}! {selectedChar.hint}
-            </p>
+            <div className="cc-empty">
+              <span className="cc-empty-emoji" aria-hidden="true">{selectedChar.emoji}</span>
+              <strong className="cc-empty-name">{selectedChar.name}</strong>
+              <p className="cc-empty-hint">{selectedChar.hint}</p>
+            </div>
           )}
           {messages.map((msg, i) => (
             <div key={i} className={`cc-msg cc-msg--${msg.role}`}>
