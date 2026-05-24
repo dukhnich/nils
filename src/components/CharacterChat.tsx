@@ -23,6 +23,7 @@ export function CharacterChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [streaming, setStreaming] = useState(false);
+  const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
@@ -59,11 +60,14 @@ export function CharacterChat() {
 
     setDraft('');
     setError('');
+    setStatus('');
 
     let encodedImages: string[] | undefined;
+    let encodedImageTitles: string[] | undefined;
     if (selectedImages.size > 0) {
       const toEncode = BOOK_IMAGES.filter((img) => selectedImages.has(img.id));
       encodedImages = await Promise.all(toEncode.map(toBase64));
+      encodedImageTitles = toEncode.map((img) => img.title);
       setSelectedImages(new Set());
       setGalleryOpen(false);
     }
@@ -95,6 +99,8 @@ export function CharacterChat() {
         prefill || undefined,
         sessionId,
         encodedImages,
+        (s) => setStatus(s === 'grounding' ? 'Examining illustration…' : s),
+        encodedImageTitles,
       );
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== 'AbortError') {
@@ -103,6 +109,7 @@ export function CharacterChat() {
       }
     } finally {
       setStreaming(false);
+      setStatus('');
       abortRef.current = null;
       inputRef.current?.focus();
     }
@@ -194,6 +201,7 @@ export function CharacterChat() {
             </div>
           )}
 
+          {status && <p className="cc-status">{status}</p>}
           {error && <p className="cc-error cc-error--chat">{error}</p>}
 
           <div className="cc-input-row">

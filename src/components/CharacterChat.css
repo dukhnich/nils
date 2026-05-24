@@ -213,6 +213,14 @@
 }
 
 /* ---- input row ---- */
+.cc-status {
+  color: var(--accent, #7850ff);
+  font-size: 0.78rem;
+  margin: 0;
+  padding: 4px 20px 0;
+  opacity: 0.8;
+}
+
 .cc-error {
   color: #f88;
   font-size: 0.82rem;

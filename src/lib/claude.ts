@@ -10,11 +10,13 @@ export async function streamChat(
   prefill?: string,
   sessionId?: string,
   images?: string[],
+  onStatus?: (status: string) => void,
+  imageTitles?: string[],
 ): Promise<void> {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemPrompt, messages, temperature, stopSequences, prefill, sessionId, images }),
+    body: JSON.stringify({ systemPrompt, messages, temperature, stopSequences, prefill, sessionId, images, imageTitles }),
     signal,
   });
 
@@ -39,8 +41,9 @@ export async function streamChat(
       if (!line.startsWith('data: ')) continue;
       const data = line.slice(6).trim();
       if (data === '[DONE]') return;
-      const parsed = JSON.parse(data) as { text?: string; error?: string };
+      const parsed = JSON.parse(data) as { text?: string; error?: string; status?: string };
       if (parsed.error) throw new Error(parsed.error);
+      if (parsed.status) { onStatus?.(parsed.status); continue; }
       if (parsed.text) onText(parsed.text);
     }
   }

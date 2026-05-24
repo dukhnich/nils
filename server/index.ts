@@ -140,20 +140,21 @@ type Message = { role: 'user' | 'assistant'; content: string };
 
 type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
 
+function parseImageBlock(dataUrl: string): Anthropic.ImageBlockParam {
+  const comma = dataUrl.indexOf(',');
+  const header = dataUrl.slice(0, comma);
+  const data = dataUrl.slice(comma + 1);
+  const mediaType = (header.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg') as SupportedMediaType;
+  return { type: 'image', source: { type: 'base64', media_type: mediaType, data } };
+}
+
 function buildApiMessages(messages: Message[], images?: string[]): Anthropic.MessageParam[] {
   return messages.map((m, i) => {
     const isLastUser = i === messages.length - 1 && m.role === 'user';
     if (isLastUser && images && images.length > 0) {
-      const imageBlocks: Anthropic.ImageBlockParam[] = images.map((dataUrl) => {
-        const comma = dataUrl.indexOf(',');
-        const header = dataUrl.slice(0, comma);
-        const data = dataUrl.slice(comma + 1);
-        const mediaType = (header.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg') as SupportedMediaType;
-        return { type: 'image', source: { type: 'base64', media_type: mediaType, data } };
-      });
       return {
         role: 'user',
-        content: [...imageBlocks, { type: 'text', text: m.content, cache_control: { type: 'ephemeral' } }],
+        content: [...images.map(parseImageBlock), { type: 'text', text: m.content, cache_control: { type: 'ephemeral' } }],
       };
     }
     if (isLastUser) {
@@ -163,11 +164,49 @@ function buildApiMessages(messages: Message[], images?: string[]): Anthropic.Mes
   });
 }
 
+// --- Illustration grounding workflow ------------------------------------------
+// Step 1: identify the scene with a fast vision call
+// Step 2: RAG search for matching story passages
+// Returns a context string injected into the system prompt before the main call
+
+async function groundIllustrations(images: string[], titles: string[]): Promise<string> {
+  const titlesStr = titles.join(', ');
+
+  // Step 1: RAG search by known title — precise, no inference needed
+  const passages = await searchStory(titlesStr);
+  const hasPassages = passages && passages !== 'No relevant passages found.' && passages !== 'Story index not initialised.';
+
+  // Step 2: Haiku describes visual atmosphere — identification is already known
+  const resp = await client.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 150,
+    messages: [{
+      role: 'user',
+      content: [
+        ...images.map(parseImageBlock),
+        {
+          type: 'text',
+          text: `This is an illustration of ${titlesStr} from "The Wonderful Adventures of Nils Holgersson". Describe the visual mood, light, and most striking details. One or two sentences.`,
+        },
+      ],
+    }],
+  });
+
+  const visual = resp.content.find((b): b is Anthropic.TextBlock => b.type === 'text')?.text ?? '';
+
+  const parts: string[] = [`Illustration: ${titlesStr}`];
+  if (visual) parts.push(`Visual: ${visual}`);
+  if (hasPassages) parts.push(`Story context:\n${passages}`);
+
+  return parts.join('\n\n');
+}
+
 app.post('/api/chat', async (req, res) => {
   const {
     systemPrompt,
     messages,
     images,
+    imageTitles,
     temperature,
     stopSequences,
     prefill,
@@ -176,6 +215,7 @@ app.post('/api/chat', async (req, res) => {
     systemPrompt: string;
     messages: Message[];
     images?: string[];
+    imageTitles?: string[];
     temperature?: number;
     stopSequences?: string[];
     prefill?: string;
@@ -194,7 +234,22 @@ app.post('/api/chat', async (req, res) => {
   let activeStream: ReturnType<typeof client.messages.stream> | null = null;
   req.on('close', () => activeStream?.abort());
 
+  let effectiveSystemPrompt = systemPrompt;
+
   try {
+    // Illustration grounding workflow — runs before the tool loop when images are present
+    if (images && images.length > 0) {
+      res.write(`data: ${JSON.stringify({ status: 'grounding' })}\n\n`);
+      try {
+        const context = await groundIllustrations(images, imageTitles ?? []);
+        if (context) {
+          effectiveSystemPrompt = `${systemPrompt}\n\n[ILLUSTRATION CONTEXT — the reader has shared an image with you. Use this to inform your response:\n${context}]`;
+        }
+      } catch {
+        // fall through with original system prompt
+      }
+    }
+
     // Tool loop — runs non-streaming until Claude stops calling tools
     let currentMessages: Anthropic.MessageParam[] = seed;
 
@@ -204,7 +259,7 @@ app.post('/api/chat', async (req, res) => {
         max_tokens: 1024,
         temperature,
         stop_sequences: stopSequences,
-        system: systemPrompt,
+        system: effectiveSystemPrompt,
         messages: currentMessages,
         tools: TOOLS,
       });
@@ -232,7 +287,7 @@ app.post('/api/chat', async (req, res) => {
       max_tokens: 1024,
       temperature,
       stop_sequences: stopSequences,
-      system: systemPrompt,
+      system: effectiveSystemPrompt,
       messages: currentMessages,
     });
     activeStream = stream;
