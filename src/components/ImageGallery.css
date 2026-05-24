@@ -72,6 +72,27 @@
   overflow-anchor: none;
 }
 
+.ig-thumb-wrap {
+  display: contents;
+}
+
+.ig-band-header {
+  grid-column: 1 / -1;
+  font-size: 0.68rem;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0.5;
+  margin: 6px 0 0;
+  padding: 4px 0 2px;
+  border-top: 1px solid var(--border, #333);
+  color: var(--text, inherit);
+}
+
+.ig-band-header--first {
+  border-top: none;
+  margin-top: 0;
+}
+
 .ig-thumb {
   display: flex;
   flex-direction: column;
