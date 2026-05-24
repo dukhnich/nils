@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { BOOK_IMAGES } from '../lib/images';
+import { translations, type Lang } from '../lib/i18n';
 import './ImageGallery.css';
 
 interface Props {
@@ -8,9 +9,11 @@ interface Props {
   onToggle: (id: string) => void;
   onClose: () => void;
   characterName: string;
+  lang: Lang;
 }
 
-export function ImageGallery({ isOpen, selected, onToggle, onClose, characterName }: Props) {
+export function ImageGallery({ isOpen, selected, onToggle, onClose, characterName, lang }: Props) {
+  const t = translations[lang];
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,7 +29,7 @@ export function ImageGallery({ isOpen, selected, onToggle, onClose, characterNam
     <div className="ig-panel" hidden={!isOpen}>
       <div className="ig-header">
         <span className="ig-title">
-          Book illustrations — select to share with {characterName}
+          {t.galleryTitle(characterName)}
           {selected.size > 0 && <span className="ig-count">{selected.size} selected</span>}
         </span>
         <button className="ig-close" onClick={onClose} aria-label="Close gallery">✕</button>
@@ -35,9 +38,7 @@ export function ImageGallery({ isOpen, selected, onToggle, onClose, characterNam
         {BOOK_IMAGES.map((img, i) => {
           const isSelected = selected.has(img.id);
           const showBandHeader = i === 0 || BOOK_IMAGES[i - 1].band !== img.band;
-          const bandLabel = img.band === 1
-            ? 'Band I — Skåne to Östergötland'
-            : 'Band II — Södermanland northward and back';
+          const bandLabel = img.band === 1 ? t.band1 : t.band2;
           return (
             <div key={img.id} className="ig-thumb-wrap">
               {showBandHeader && (

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { characters, type Character } from '../characters';
 import { streamChat, type ChatMessage } from '../lib/claude';
+import { translations, type Lang, type CharId } from '../lib/i18n';
 import { BOOK_IMAGES, type BookImage } from '../lib/images';
 import { isCyrillic } from '../lib/lang';
 import { ImageGallery } from './ImageGallery';
@@ -19,6 +20,9 @@ async function toBase64(img: BookImage): Promise<string> {
 
 export function CharacterChat() {
   const [sessionId] = useState(() => crypto.randomUUID());
+  const [lang, setLang] = useState<Lang>(() =>
+    localStorage.getItem('nils-lang') === 'uk' ? 'uk' : 'en'
+  );
   const [selectedChar, setSelectedChar] = useState<Character>(characters[0]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
@@ -27,6 +31,9 @@ export function CharacterChat() {
   const [error, setError] = useState('');
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
+
+  const strings = translations[lang];
+  const charStrings = strings.characters[selectedChar.id as CharId];
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -99,7 +106,7 @@ export function CharacterChat() {
         prefill || undefined,
         sessionId,
         encodedImages,
-        (s) => setStatus(s === 'grounding' ? 'Examining illustration…' : s),
+        (s) => setStatus(s === 'grounding' ? strings.examiningIllustration : s),
         encodedImageTitles,
       );
     } catch (err: unknown) {
@@ -113,6 +120,14 @@ export function CharacterChat() {
       abortRef.current = null;
       inputRef.current?.focus();
     }
+  }
+
+  function toggleLang() {
+    setLang((prev) => {
+      const next: Lang = prev === 'en' ? 'uk' : 'en';
+      localStorage.setItem('nils-lang', next);
+      return next;
+    });
   }
 
   function stopStreaming() {
@@ -129,19 +144,24 @@ export function CharacterChat() {
   return (
     <div className="cc-root" style={{ '--accent-rgb': selectedChar.accentRgb } as React.CSSProperties}>
       {/* Character picker */}
-      <nav className="cc-picker" aria-label="Choose a character">
-        {characters.map((char) => (
-          <button
-            key={char.id}
-            className={`cc-char-btn ${selectedChar.id === char.id ? 'cc-char-btn--active' : ''}`}
-            onClick={() => selectCharacter(char)}
-            title={char.tagline}
-          >
-            <span className="cc-char-emoji" aria-hidden="true">{char.emoji}</span>
-            <span className="cc-char-name">{char.name}</span>
-          </button>
-        ))}
-      </nav>
+      <div className="cc-picker-row">
+        <nav className="cc-picker" aria-label="Choose a character">
+          {characters.map((char) => (
+            <button
+              key={char.id}
+              className={`cc-char-btn ${selectedChar.id === char.id ? 'cc-char-btn--active' : ''}`}
+              onClick={() => selectCharacter(char)}
+              title={strings.characters[char.id as CharId].tagline}
+            >
+              <span className="cc-char-emoji" aria-hidden="true">{char.emoji}</span>
+              <span className="cc-char-name">{char.name}</span>
+            </button>
+          ))}
+        </nav>
+        <button className="cc-lang-btn" onClick={toggleLang} title="Switch language">
+          {strings.switchLang}
+        </button>
+      </div>
 
       {/* Chat window */}
       <section className="cc-chat" aria-label={`Chat with ${selectedChar.name}`}>
@@ -149,7 +169,7 @@ export function CharacterChat() {
           <span className="cc-char-emoji-lg" aria-hidden="true">{selectedChar.emoji}</span>
           <div>
             <strong>{selectedChar.name}</strong>
-            <p className="cc-tagline">{selectedChar.tagline}</p>
+            <p className="cc-tagline">{charStrings.tagline}</p>
           </div>
         </div>
 
@@ -158,7 +178,7 @@ export function CharacterChat() {
             <div className="cc-empty">
               <span className="cc-empty-emoji" aria-hidden="true">{selectedChar.emoji}</span>
               <strong className="cc-empty-name">{selectedChar.name}</strong>
-              <p className="cc-empty-hint">{selectedChar.hint}</p>
+              <p className="cc-empty-hint">{charStrings.hint}</p>
             </div>
           )}
           {messages.map((msg, i) => (
@@ -182,6 +202,7 @@ export function CharacterChat() {
             onToggle={toggleImage}
             onClose={() => setGalleryOpen(false)}
             characterName={selectedChar.name}
+            lang={lang}
           />
 
           {/* Selected images strip (when gallery is closed) */}
@@ -210,7 +231,7 @@ export function CharacterChat() {
               ref={inputRef}
               className="cc-textarea"
               rows={2}
-              placeholder={`Message ${selectedChar.name}… (Enter to send, Shift+Enter for new line)`}
+              placeholder={strings.inputPlaceholder(selectedChar.name)}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -235,7 +256,7 @@ export function CharacterChat() {
                 onClick={sendMessage}
                 disabled={!draft.trim()}
               >
-                Send
+                {strings.sendButton}
               </button>
             )}
           </div>

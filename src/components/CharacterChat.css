@@ -53,14 +53,40 @@
 }
 
 /* ---- character picker ---- */
+.cc-picker-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border, #333);
+  flex-shrink: 0;
+}
+
 .cc-picker {
   display: flex;
   gap: 6px;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border, #333);
   overflow-x: auto;
   scrollbar-width: thin;
+  flex: 1;
+  border-bottom: none;
+}
+
+.cc-lang-btn {
   flex-shrink: 0;
+  padding: 4px 8px;
+  margin-right: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #444);
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+
+  &:hover {
+    opacity: 1;
+    background: var(--hover-bg, rgba(255 255 255 / 0.06));
+  }
 }
 
 .cc-char-btn {

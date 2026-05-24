@@ -2,8 +2,6 @@ export interface Character {
   id: string;
   name: string;
   emoji: string;
-  tagline: string;
-  hint: string;
   accentRgb: string;
   systemPrompt: string;
   temperature: number;
@@ -22,8 +20,6 @@ export const characters: Character[] = [
     id: 'nils',
     name: 'Nils',
     emoji: '🧒',
-    tagline: 'The boy who flies with wild geese',
-    hint: 'Ask about the tomte, what it\'s like to ride Morten, or life at thumb-size.',
     accentRgb: '52, 132, 95',
     temperature: 0.8,
     stopSequences: DIALOGUE_STOPS,
@@ -38,8 +34,6 @@ Speak in first person as Nils. You are small enough that a crow's feather is as 
     id: 'morten',
     name: 'Morten',
     emoji: '🪿',
-    tagline: 'The loyal white goose who carries Nils',
-    hint: 'Ask about flying with the wild geese, carrying Nils, or the farm you left behind.',
     accentRgb: '76, 140, 112',
     temperature: 0.5,
     stopSequences: DIALOGUE_STOPS,
@@ -54,8 +48,6 @@ Speak in first person as Morten. Refer to Nils affectionately. You are in awe of
     id: 'akka',
     name: 'Akka',
     emoji: '🦢',
-    tagline: 'The ancient, wise leader of the wild grey geese',
-    hint: 'Ask about the laws of migration, the flock, or what you make of the boy.',
     accentRgb: '64, 116, 142',
     temperature: 0.3,
     stopSequences: ['\n\n', ...DIALOGUE_STOPS],
@@ -69,8 +61,6 @@ Speak in first person as Akka. Your speech is deliberate and spare. You refer to
     id: 'smirre',
     name: 'Smirre',
     emoji: '🦊',
-    tagline: 'The cunning fox who will not give up the chase',
-    hint: 'Ask about your schemes against the geese, your grudge with Nils, or the hunt.',
     accentRgb: '188, 80, 38',
     temperature: 0.9,
     stopSequences: DIALOGUE_STOPS,
@@ -85,8 +75,6 @@ Speak in first person as Smirre. You are always calculating. You speak of Nils w
     id: 'gorgo',
     name: 'Gorgo',
     emoji: '🦅',
-    tagline: 'The great eagle who soars above it all',
-    hint: 'Ask what you see from the heights, why you befriended the tiny boy, or life as an eagle.',
     accentRgb: '180, 132, 40',
     temperature: 0.4,
     stopSequences: DIALOGUE_STOPS,
@@ -100,8 +88,6 @@ Speak in first person as Gorgo. You see the world from great height, literally a
     id: 'dunfin',
     name: 'Dunfin',
     emoji: '🐦',
-    tagline: 'The cheerful puffin of the Stockholm archipelago',
-    hint: 'Ask about the island skerries, what you think of Nils, or life on the archipelago.',
     accentRgb: '32, 148, 166',
     temperature: 1.0,
     stopSequences: DIALOGUE_STOPS,
