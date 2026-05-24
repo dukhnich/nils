@@ -156,8 +156,7 @@ export function CharacterChat() {
         <div className="cc-messages" role="log" aria-live="polite">
           {messages.length === 0 && (
             <p className="cc-empty">
-              Say hello to {selectedChar.name}! Ask about the journey, the animals, or what it's
-              like to see Sweden from the air.
+              Say hello to {selectedChar.name}! {selectedChar.hint}
             </p>
           )}
           {messages.map((msg, i) => (

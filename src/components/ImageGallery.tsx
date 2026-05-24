@@ -39,11 +39,13 @@ export function ImageGallery({ isOpen, selected, onToggle, onClose, characterNam
               key={img.id}
               className={`ig-thumb ${isSelected ? 'ig-thumb--selected' : ''}`}
               onClick={() => onToggle(img.id)}
-              title={img.title}
               aria-pressed={isSelected}
             >
-              <img src={img.src} alt={img.title} loading="lazy" />
-              {isSelected && <span className="ig-check" aria-hidden="true">✓</span>}
+              <div className="ig-thumb-img">
+                <img src={img.src} alt={img.title} loading="lazy" />
+                {isSelected && <span className="ig-check" aria-hidden="true">✓</span>}
+              </div>
+              <span className="ig-thumb-title">{img.title}</span>
             </button>
           );
         })}
