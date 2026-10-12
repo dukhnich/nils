@@ -1,6 +1,6 @@
 # UA Chapter Index
 
-Source: `documentation/laherlef-selma-dyvovyzhna-podorozh-nilsa-kholhersona-z-dykymy-husakamy-shvetsiieiu-(dyvovyzhni-mandry-nilsa-z-dykymy-husmy)8371.html`
+Source: `documentation/nils_ua.html`
 Edition: Ukrainian, abridged, 17 chapters.
 Extracted from the HTML headings + opening paragraphs; use HTML line numbers to navigate to the full text.
 

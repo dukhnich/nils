@@ -26,3 +26,6 @@ dist-ssr
 .claude/settings.local.json
 .env
 server/.rag-cache.json
+
+# Book source texts (third-party translations) — kept locally, see README
+documentation/*.html

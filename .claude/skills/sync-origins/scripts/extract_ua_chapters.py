@@ -4,7 +4,7 @@
 Usage:
     python3 extract_ua_chapters.py [path/to/ua.html]
 
-Defaults to documentation/laherlef-selma-*.html relative to the repo root.
+Defaults to documentation/nils_ua.html relative to the repo root.
 Prints a Markdown table suitable for references/ua_chapters.md.
 """
 
@@ -12,10 +12,7 @@ import re
 import sys
 from pathlib import Path
 
-DEFAULT = (
-    "documentation/laherlef-selma-dyvovyzhna-podorozh-nilsa-kholhersona-"
-    "z-dykymy-husakamy-shvetsiieiu-(dyvovyzhni-mandry-nilsa-z-dykymy-husmy)8371.html"
-)
+DEFAULT = "documentation/nils_ua.html"
 
 UA_CHAPTER_RE = re.compile(
     r"Розділ (перший|другий|третій|четвертий|п.ятий|шостий|сьомий|восьмий|"

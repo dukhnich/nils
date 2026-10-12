@@ -4,9 +4,9 @@
 The file is windows-1251 encoded — this script handles that automatically.
 
 Usage:
-    python3 extract_ru_chapters.py [path/to/Nisl_braude.html]
+    python3 extract_ru_chapters.py [path/to/nils_ru_full.html]
 
-Defaults to documentation/Nisl_braude.html relative to the repo root.
+Defaults to documentation/nils_ru_full.html relative to the repo root.
 Prints a Markdown table suitable for references/ru_chapters.md.
 """
 
@@ -14,7 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-DEFAULT = "documentation/Nisl_braude.html"
+DEFAULT = "documentation/nils_ru_full.html"
 
 # Roman numerals I–LV followed immediately by a Cyrillic title (no space in the HTML)
 CHAPTER_RE = re.compile(

@@ -1,6 +1,6 @@
 # RU Chapter Index (Brauде 1982)
 
-Source: `documentation/Nisl_braude.html`
+Source: `documentation/nils_ru_full.html`
 Encoding: windows-1251 (open with `python3` or a browser — the file will appear garbled in plain `cat`).
 Edition: Selma Lagerlöf, *Удивительное путешествие Нильса Хольгерссона с дикими гусями по Швеции*, transl. L. Brauде, 1982. Full translation, 55 chapters, structured as Том Первый (I–XXI) and Том Второй (XXII–LV).
 

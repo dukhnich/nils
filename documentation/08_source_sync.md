@@ -4,7 +4,7 @@
 
 Для синхронізації модулів, сюжету і текстів використовуємо три основні джерела:
 
-- **основний текст (укр., скорочена редакція, 17 розділів):** `./laherlef-selma-dyvovyzhna-podorozh-nilsa-kholhersona-z-dykymy-husakamy-shvetsiieiu-(dyvovyzhni-mandry-nilsa-z-dykymy-husmy)8371.html`
+- **основний текст (укр., скорочена редакція, 17 розділів):** `./nils_ua.html`
 - **резервний текст (рос., повний переклад Л. Брауде, 1982, ~55 розділів):** `https://www.rulit.me/author/braude-lyudmila-yulevna/udivitelnoe-puteshestvie-nilsa-holgersona-s-dikimi-gusyami-po-shvecii-pervyj-polnyj-perevod-na-russk-download-879932.html`
 - **synopsis епізодів:** `https://www.imdb.com/title/tt0296386/episodes/`
 

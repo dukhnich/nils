@@ -9,8 +9,8 @@ model: sonnet
 
 The book and the TV series are not always aligned: episodes reorder events, compress arcs, or invent scenes. The Ukrainian book text is also an abridged 17-chapter edition, so it can miss material the episodes draw on. Whenever you are about to write or reason about *what happens* in the story, you must first reconcile the canonical sources defined in `documentation/08_source_sync.md`:
 
-- **Primary book text (UA, abridged, 17 chapters):** `documentation/laherlef-selma-dyvovyzhna-podorozh-nilsa-kholhersona-z-dykymy-husakamy-shvetsiieiu-(dyvovyzhni-mandry-nilsa-z-dykymy-husmy)8371.html`
-- **Fallback book text (RU, full Brauде translation, 1982, ~55 chapters):** `documentation/Nisl_braude.html` (windows-1251 encoded); use only when the UA edition is missing the needed scene/passage.
+- **Primary book text (UA, abridged, 17 chapters):** `documentation/nils_ua.html`
+- **Fallback book text (RU, full Brauде translation, 1982, ~55 chapters):** `documentation/nils_ru_full.html` (windows-1251 encoded); use only when the UA edition is missing the needed scene/passage.
 - **Episode synopses:** `https://www.imdb.com/title/tt0296386/episodes/`
 
 ## When this skill applies
@@ -35,7 +35,7 @@ Skip when the task is purely formatting, layout, or non-plot metadata.
 3. **If the UA text is missing the needed material, fall back to the RU full edition (Brauде, 1982)**
    - Confirm the gap is real (the scene is not in the UA 17-chapter abridgement, not just under a different chapter title).
    - Consult `references/ru_chapters.md` for the RU chapter index (titles, HTML line numbers, province/theme, UA↔RU alignment table) before opening the full RU HTML.
-   - The RU file (`documentation/Nisl_braude.html`) is windows-1251 encoded — read it with `python3 open(..., encoding="windows-1251")`, not plain `cat`.
+   - The RU file (`documentation/nils_ru_full.html`) is windows-1251 encoded — read it with `python3 open(..., encoding="windows-1251")`, not plain `cat`.
    - Locate the corresponding passage in the RU full translation referenced in `08_source_sync.md`.
    - When quoting from RU, output the **Russian original** AND an **auto-translation into Ukrainian** side by side, and label both clearly (`оригінал (рос., Брауде 1982)` / `автопереклад укр.`). Never present a Russian-derived passage as if it were the UA canonical text.
 4. **Compare** — note any mismatches between book(s) and episode: reordered events, omitted characters, invented scenes, compressed arcs, or content present only in the RU full edition.

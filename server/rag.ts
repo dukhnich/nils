@@ -25,15 +25,12 @@ const BOOKS = [
   {
     source: 'uk' as const,
     encoding: 'utf-8',
-    path: join(
-      __dir,
-      '../documentation/laherlef-selma-dyvovyzhna-podorozh-nilsa-kholhersona-z-dykymy-husakamy-shvetsiieiu-(dyvovyzhni-mandry-nilsa-z-dykymy-husmy)8371.html',
-    ),
+    path: join(__dir, '../documentation/nils_ua.html'),
   },
   {
     source: 'ru' as const,
     encoding: 'windows-1251',
-    path: join(__dir, '../documentation/Nisl_braude.html'),
+    path: join(__dir, '../documentation/nils_ru_full.html'),
   },
 ];
 
@@ -97,6 +94,11 @@ function buildChunks(): Chunk[] {
   const chunks: Chunk[] = [];
   let id = 0;
   for (const book of BOOKS) {
+    // Source texts are not in the repo (third-party translations) — see README
+    if (!existsSync(book.path)) {
+      console.warn(`RAG: ${book.source} source text not found, skipping: ${book.path}`);
+      continue;
+    }
     const buf = readFileSync(book.path);
     const html = book.encoding === 'utf-8'
       ? buf.toString('utf-8')
@@ -151,7 +153,7 @@ function dot(a: number[], b: number[]): number {
 // --- Cache -------------------------------------------------------------------
 
 function bookMtimes(): Record<string, number> {
-  return Object.fromEntries(BOOKS.map(b => [b.source, statSync(b.path).mtimeMs]));
+  return Object.fromEntries(BOOKS.map(b => [b.source, existsSync(b.path) ? statSync(b.path).mtimeMs : 0]));
 }
 
 function isCacheValid(cache: Cache): boolean {

@@ -34,6 +34,6 @@ Create a `.env` file in the project root:
 - Prefill assistant turns are injected into the message array before the API call to guide character voice.
 - Prompt caching: the last user message always gets `cache_control: { type: 'ephemeral' }`.
 
-**RAG** (`server/rag.ts`): Indexes two HTML source texts from `documentation/` (Ukrainian UTF-8 + Russian Windows-1251). On startup, chunks them, optionally embeds with VoyageAI, and caches to `server/.rag-cache.json`. Search uses RRF to merge BM25 and cosine-similarity rankings, returning up to 3 passages.
+**RAG** (`server/rag.ts`): Indexes two HTML source texts from `documentation/` (Ukrainian UTF-8 + Russian Windows-1251). The texts are third-party translations and are git-ignored (`documentation/*.html`): they exist only locally, and a missing file is skipped with a warning. On startup, chunks them, optionally embeds with VoyageAI, and caches to `server/.rag-cache.json`. Search uses RRF to merge BM25 and cosine-similarity rankings, returning up to 3 passages.
 
 **Book images** (`public/images/band1/`, `public/images/band2/`): Scanned illustrations served as static files. `src/lib/images.ts` exports `BOOK_IMAGES`. The gallery (`ImageGallery.tsx`) is always mounted (never unmounted) to avoid browser auto-scroll bugs; images selected in the gallery are base64-encoded and sent as vision blocks in the next message.
